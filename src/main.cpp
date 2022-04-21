@@ -43,19 +43,36 @@ MAKE_HOOK_MATCH(Localization_SelectLanguage, &GlobalNamespace::MainSystemInit::I
     getLogger().info("Replacing base game localization file!");
     Polyglot::LocalizationAsset * og_local = Polyglot::Localization::get_Instance()->get_InputFiles()->items[0];
 
-    using LoadFromMemory = function_ptr_t<UnityEngine::AssetBundle*, Array<uint8_t>*, unsigned int>;
-    static LoadFromMemory loadFromMemory = reinterpret_cast<LoadFromMemory>(il2cpp_functions::resolve_icall("UnityEngine.AssetBundle::LoadFromMemory_Internal"));
+//    using LoadFromMemory = function_ptr_t<UnityEngine::AssetBundle*, Array<uint8_t>*, unsigned int>;
+//    static LoadFromMemory loadFromMemory = reinterpret_cast<LoadFromMemory>(il2cpp_functions::resolve_icall("UnityEngine.AssetBundle::LoadFromMemory_Internal"));
+//
+//    std::vector<uint8_t> data;// = *((std::vector<uint8_t>*)&bytes);
+//    data.insert(data.end(), &(testbundle_asset::getData()[0]), &(testbundle_asset::getData()[testbundle_asset::getLength()]));
+//
+//    Array<uint8_t>* dataArray = il2cpp_utils::vectorToArray(data);
+//
+//    auto bundle = loadFromMemory(dataArray, 0);
+//
+//    auto * textAsset = bundle->LoadAsset<UnityEngine::TextAsset*>("Localization_CNMOD");
 
-    std::vector<uint8_t> data;// = *((std::vector<uint8_t>*)&bytes);
-    data.insert(data.end(), &(testbundle_asset::getData()[0]), &(testbundle_asset::getData()[testbundle_asset::getLength()]));
+    auto * textAsset = reinterpret_cast<UnityEngine::TextAsset*>(UnityEngine::TextAsset::New_ctor());
 
-    Array<uint8_t>* dataArray = il2cpp_utils::vectorToArray(data);
+    //////////////
+    textAsset->klass = classof(UnityEngine::TextAsset*); // Sc2ad told me to do this!
+    // Sc2ad also said
+    // !!!NEVER DO THIS Because that is a very risky thing to do in general!!!
+    //////////////
 
-    auto bundle = loadFromMemory(dataArray, 0);
+    using TextAssetCreate = function_ptr_t<void, UnityEngine::TextAsset*, StringW>;
+    static auto internal_create_instance = CRASH_UNLESS(reinterpret_cast<TextAssetCreate>(il2cpp_functions::resolve_icall("UnityEngine.TextAsset::Internal_CreateInstance")));
 
-    auto * textAsset = bundle->LoadAsset<UnityEngine::TextAsset*>("Localization_CNMOD");
+    StringW s(localization);
+
+    internal_create_instance(textAsset, s);
 
     Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(textAsset);
+
+
     Polyglot::LocalizationImporter::Refresh();
     Localization_SelectLanguage(self);
 }
