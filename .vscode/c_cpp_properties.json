@@ -15,7 +15,7 @@
         "${workspaceFolder}/shared", 
         "${workspaceFolder}",
         
-        "C:\Users\qe201\AppData\Local\Android\Sdk\ndk\24.0.8215888/**",
+        "C:/Users/qe201/AppData/Local/Android/Sdk/ndk/24.0.8215888/**",
         "${default}"
       ],
       "name": "Quest",
