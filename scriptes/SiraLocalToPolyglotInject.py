@@ -23,6 +23,7 @@ for key in sira:
         continue
     if key in bs_og and sira[key][CNS] != '':
         bs_og[key][EN] = sira[key][CNS]
+        bs_og[key][CNS] = sira[key][CNS]
 
 # output new polyglot csv
 with open("Localization_CNMOD_new.csv", 'w', encoding='utf-8', newline='') as new_csv:
