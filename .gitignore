@@ -65,3 +65,6 @@ extern.cmake
 
 # QMOD Schema
 mod.json.schema
+
+# temp localization files
+scriptes/*.csv
