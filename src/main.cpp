@@ -6,10 +6,9 @@
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "assets.hpp"
-#include "UnityEngine/AssetBundle.hpp"
-
+#include "helpers.h"
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
-static char* localization = new char[Localization_CNMOD_txt::getLength() + 1];
+static char* sira_new;
 
 // Loads the config from disk using our modInfo, then returns it for use
 Configuration& getConfig() {
@@ -24,6 +23,13 @@ Logger& getLogger() {
     return *logger;
 }
 
+void loadLocalizationFile(){
+    sira_new = new char[sira_new_csv::getLength() + 1];
+    memcpy(sira_new, sira_new_csv::getData(), sira_new_csv::getLength());
+    sira_new[sira_new_csv::getLength()] = '\0';
+    getLogger().info("Sira Localization File Loaded, Length %lu", sira_new_csv::getLength());
+}
+
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
     info.id = MOD_ID;
@@ -32,49 +38,35 @@ extern "C" void setup(ModInfo& info) {
 
     getConfig().Load(); // Load the config file
 
-    memcpy(localization, Localization_CNMOD_txt::getData(), Localization_CNMOD_txt::getLength());
-    localization[Localization_CNMOD_txt::getLength()] = '\0';
+    loadLocalizationFile();
 
     getLogger().info("Completed setup!");
 }
 
-MAKE_HOOK_MATCH(Localization_SelectLanguage, &GlobalNamespace::MainSystemInit::Init, void, GlobalNamespace::MainSystemInit* self) {
-    getLogger().info("Hook triggered!");
+MAKE_HOOK_MATCH(MainSystemInitHook, &GlobalNamespace::MainSystemInit::Init, void, GlobalNamespace::MainSystemInit* self) {
+    getLogger().info("%s triggered!", name());
     getLogger().info("Replacing base game localization file!");
-    Polyglot::LocalizationAsset * og_local = Polyglot::Localization::get_Instance()->get_InputFiles()->items[0];
 
-//    using LoadFromMemory = function_ptr_t<UnityEngine::AssetBundle*, Array<uint8_t>*, unsigned int>;
-//    static LoadFromMemory loadFromMemory = reinterpret_cast<LoadFromMemory>(il2cpp_functions::resolve_icall("UnityEngine.AssetBundle::LoadFromMemory_Internal"));
-//
-//    std::vector<uint8_t> data;// = *((std::vector<uint8_t>*)&bytes);
-//    data.insert(data.end(), &(testbundle_asset::getData()[0]), &(testbundle_asset::getData()[testbundle_asset::getLength()]));
-//
-//    Array<uint8_t>* dataArray = il2cpp_utils::vectorToArray(data);
-//
-//    auto bundle = loadFromMemory(dataArray, 0);
-//
-//    auto * textAsset = bundle->LoadAsset<UnityEngine::TextAsset*>("Localization_CNMOD");
+    Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(makeTextAsset(sira_new));
 
-    auto * textAsset = reinterpret_cast<UnityEngine::TextAsset*>(UnityEngine::TextAsset::New_ctor());
-
-    //////////////
-    textAsset->klass = classof(UnityEngine::TextAsset*); // Sc2ad told me to do this!
-    // Sc2ad also said
-    // !!!NEVER DO THIS Because that is a very risky thing to do in general!!!
-    //////////////
-
-    using TextAssetCreate = function_ptr_t<void, UnityEngine::TextAsset*, StringW>;
-    static auto internal_create_instance = CRASH_UNLESS(reinterpret_cast<TextAssetCreate>(il2cpp_functions::resolve_icall("UnityEngine.TextAsset::Internal_CreateInstance")));
-
-    StringW s(localization);
-
-    internal_create_instance(textAsset, s);
-
-    Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(textAsset);
-
+//    auto * localizationAsset = new Polyglot::LocalizationAsset();
+//    localizationAsset->set_TextAsset(makeTextAsset(localization));
+//    localizationAsset->set_Format(Polyglot::GoogleDriveDownloadFormat::CSV);
+//    Polyglot::Localization::get_Instance()->get_InputFiles()->Add(localizationAsset);
 
     Polyglot::LocalizationImporter::Refresh();
-    Localization_SelectLanguage(self);
+
+    getLogger().debug("Loaded localization assets: %d", Polyglot::Localization::get_Instance()->get_InputFiles()->size);
+    MainSystemInitHook(self);
+}
+
+MAKE_HOOK_MATCH(LocalizationImporterInitHook, &Polyglot::LocalizationImporter::Initialize, void) {
+    getLogger().info("%s triggered!", name());
+    LocalizationImporterInitHook();
+    auto instance = Polyglot::Localization::get_Instance();
+    if (!instance->get_SupportedLanguages()->Contains(Polyglot::Language::Simplified_Chinese)) {
+        instance->get_SupportedLanguages()->Add(Polyglot::Language::Simplified_Chinese);
+    }
 }
 
 // Called later on in the game loading - a good time to install function hooks
@@ -85,11 +77,7 @@ extern "C" void load() {
 
     getLogger().info("Installing hooks...");
     // Install our hooks (none defined yet)
-    INSTALL_HOOK(logger, Localization_SelectLanguage)
+    INSTALL_HOOK(logger, MainSystemInitHook)
+    INSTALL_HOOK(logger, LocalizationImporterInitHook)
     getLogger().info("Installed all hooks!");
-
-    getLogger().info("Test Log");
-
-    getLogger().info("Localization File Length: %lu", Localization_CNMOD_txt::getLength());
-
 }
