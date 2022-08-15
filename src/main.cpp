@@ -82,8 +82,8 @@ MAKE_HOOK_MATCH(ActiveSceneChangeHook, &UnityEngine::SceneManagement::SceneManag
                 UnityEngine::SceneManagement::Scene newActiveScene) {
     getLogger().debug("%s triggered!", name());
     ActiveSceneChangeHook(previousActiveScene, newActiveScene);
-    getLogger().debug("%s -> %s", static_cast<string>(previousActiveScene.get_name()).c_str(),
-                      static_cast<string>(newActiveScene.get_name()).c_str());
+//    getLogger().debug("%s -> %s", static_cast<string>(previousActiveScene.get_name()).c_str(),
+//                      static_cast<string>(newActiveScene.get_name()).c_str());
     if (UnityEngine::SceneManagement::SceneManager::_get_activeSceneChanged() == nullptr) return;
 
     FontLoader::getInstance()->OnActiveSceneChange();
@@ -99,5 +99,6 @@ extern "C" void load() {
     // Install our hooks (none defined yet)
     INSTALL_HOOK(logger, MainSystemInitHook)
     INSTALL_HOOK(logger, LocalizationImporterInitHook)
+    INSTALL_HOOK(logger, ActiveSceneChangeHook)
     getLogger().info("Installed all hooks!");
 }

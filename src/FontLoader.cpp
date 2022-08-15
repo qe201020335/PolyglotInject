@@ -57,6 +57,7 @@ FontLoader *FontLoader::getInstance() {
 }
 
 void FontLoader::OnActiveSceneChange() {
+    logger.debug("OnActiveSceneChange");
 //    sceneChangeMtx.lock();
     if (sceneChangeSubbed) {
         ApplyFallbackFonts();
@@ -102,9 +103,17 @@ void FontLoader::LoadFontAsset(UnityEngine::AssetBundle *assetBundle, const stri
 }
 
 void FontLoader::ApplyFallbackFonts() {
-    if (fallbackFontAssets.empty()) return;
+    logger.debug("ApplyFallbackFonts");
+    if (fallbackFontAssets.empty()) {
+        logger.debug("no fallback font assets loaded");
+        return;
+    }
 
     auto fontAssets = UnityEngine::Resources::FindObjectsOfTypeAll<TMPro::TMP_FontAsset *>();
+    logger.debug("There are %lu TMP_FontAsset currently in the game", fontAssets.size());
+    for (auto *fontAsset: fontAssets) {
+        logger.debug("%s (%d)", static_cast<string>(fontAsset->get_name()).c_str(), (uint) fontAsset->GetHashCode());
+    }
 
     for (auto &strategy: kFontReplacementStrategies) {
         auto fontAssetsToAddFallback =
