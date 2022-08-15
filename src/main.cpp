@@ -7,23 +7,27 @@
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "assets.hpp"
 #include "helpers.h"
+#include "fontLoader.hpp"
+#include "UnityEngine/SceneManagement/Scene.hpp"
+#include "UnityEngine/SceneManagement/SceneManager.hpp"
+
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
-static char* sira_new;
+static char *sira_new;
 
 // Loads the config from disk using our modInfo, then returns it for use
-Configuration& getConfig() {
+Configuration &getConfig() {
     static Configuration config(modInfo);
     config.Load();
     return config;
 }
 
 // Returns a logger, useful for printing debug messages
-Logger& getLogger() {
-    static Logger* logger = new Logger(modInfo);
+Logger &getLogger() {
+    static Logger *logger = new Logger(modInfo);
     return *logger;
 }
 
-void loadLocalizationFile(){
+void loadLocalizationFile() {
     sira_new = new char[sira_new_csv::getLength() + 1];
     memcpy(sira_new, sira_new_csv::getData(), sira_new_csv::getLength());
     sira_new[sira_new_csv::getLength()] = '\0';
@@ -31,7 +35,7 @@ void loadLocalizationFile(){
 }
 
 // Called at the early stages of game loading
-extern "C" void setup(ModInfo& info) {
+extern "C" void setup(ModInfo &info) {
     info.id = MOD_ID;
     info.version = VERSION;
     modInfo = info;
@@ -43,8 +47,9 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
-MAKE_HOOK_MATCH(MainSystemInitHook, &GlobalNamespace::MainSystemInit::Init, void, GlobalNamespace::MainSystemInit* self) {
-    getLogger().info("%s triggered!", name());
+MAKE_HOOK_MATCH(MainSystemInitHook, &GlobalNamespace::MainSystemInit::Init, void,
+                GlobalNamespace::MainSystemInit *self) {
+    getLogger().debug("%s triggered!", name());
     getLogger().info("Replacing base game localization file!");
 
     Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(makeTextAsset(sira_new));
@@ -53,20 +58,35 @@ MAKE_HOOK_MATCH(MainSystemInitHook, &GlobalNamespace::MainSystemInit::Init, void
 //    localizationAsset->set_TextAsset(makeTextAsset(localization));
 //    localizationAsset->set_Format(Polyglot::GoogleDriveDownloadFormat::CSV);
 //    Polyglot::Localization::get_Instance()->get_InputFiles()->Add(localizationAsset);
+//    getLogger().debug("Loaded localization assets: %d", Polyglot::Localization::get_Instance()->get_InputFiles()->size);
 
     Polyglot::LocalizationImporter::Refresh();
 
-    getLogger().debug("Loaded localization assets: %d", Polyglot::Localization::get_Instance()->get_InputFiles()->size);
+//    FontLoader::getInstance()->Dispose();
+    FontLoader::getInstance()->Initialize();
+
     MainSystemInitHook(self);
 }
 
 MAKE_HOOK_MATCH(LocalizationImporterInitHook, &Polyglot::LocalizationImporter::Initialize, void) {
-    getLogger().info("%s triggered!", name());
+    getLogger().debug("%s triggered!", name());
     LocalizationImporterInitHook();
     auto instance = Polyglot::Localization::get_Instance();
     if (!instance->get_SupportedLanguages()->Contains(Polyglot::Language::Simplified_Chinese)) {
         instance->get_SupportedLanguages()->Add(Polyglot::Language::Simplified_Chinese);
     }
+}
+
+MAKE_HOOK_MATCH(ActiveSceneChangeHook, &UnityEngine::SceneManagement::SceneManager::Internal_ActiveSceneChanged, void,
+                UnityEngine::SceneManagement::Scene previousActiveScene,
+                UnityEngine::SceneManagement::Scene newActiveScene) {
+    getLogger().debug("%s triggered!", name());
+    ActiveSceneChangeHook(previousActiveScene, newActiveScene);
+    getLogger().debug("%s -> %s", static_cast<string>(previousActiveScene.get_name()).c_str(),
+                      static_cast<string>(newActiveScene.get_name()).c_str());
+    if (UnityEngine::SceneManagement::SceneManager::_get_activeSceneChanged() == nullptr) return;
+
+    FontLoader::getInstance()->OnActiveSceneChange();
 }
 
 // Called later on in the game loading - a good time to install function hooks
