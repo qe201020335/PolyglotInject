@@ -2,7 +2,6 @@
 #include "Polyglot/LocalizationImporter.hpp"
 #include "Polyglot/Localization.hpp"
 #include "Polyglot/LocalizationAsset.hpp"
-#include "UnityEngine/TextAsset.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "assets.hpp"
@@ -23,7 +22,7 @@ Logger& getLogger() {
     return *logger;
 }
 
-void loadLocalizationFile(){
+void loadLocalizationFile() {
     sira_new = new char[sira_new_csv::getLength() + 1];
     memcpy(sira_new, sira_new_csv::getData(), sira_new_csv::getLength());
     sira_new[sira_new_csv::getLength()] = '\0';
@@ -44,24 +43,25 @@ extern "C" void setup(ModInfo& info) {
 }
 
 MAKE_HOOK_MATCH(MainSystemInitHook, &GlobalNamespace::MainSystemInit::Init, void, GlobalNamespace::MainSystemInit* self) {
-    getLogger().info("%s triggered!", name());
-    getLogger().info("Replacing base game localization file!");
+    getLogger().debug("%s triggered!", name());
+    getLogger().info("Injecting base game localization file!");
 
-    Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(makeTextAsset(sira_new));
+//    Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(makeTextAsset(sira_new));
 
-//    auto * localizationAsset = new Polyglot::LocalizationAsset();
-//    localizationAsset->set_TextAsset(makeTextAsset(localization));
-//    localizationAsset->set_Format(Polyglot::GoogleDriveDownloadFormat::CSV);
-//    Polyglot::Localization::get_Instance()->get_InputFiles()->Add(localizationAsset);
+    auto * localizationAsset = Polyglot::LocalizationAsset::New_ctor();
+    localizationAsset->set_TextAsset(makeTextAsset(sira_new));
+    localizationAsset->set_Format(Polyglot::GoogleDriveDownloadFormat::CSV);
+    Polyglot::Localization::get_Instance()->get_InputFiles()->Add(localizationAsset);
+    getLogger().info("Localization file injected!");
 
     Polyglot::LocalizationImporter::Refresh();
 
-    getLogger().debug("Loaded localization assets: %d", Polyglot::Localization::get_Instance()->get_InputFiles()->size);
+    getLogger().debug("Number of loaded localization assets: %d", Polyglot::Localization::get_Instance()->get_InputFiles()->size);
     MainSystemInitHook(self);
 }
 
 MAKE_HOOK_MATCH(LocalizationImporterInitHook, &Polyglot::LocalizationImporter::Initialize, void) {
-    getLogger().info("%s triggered!", name());
+    getLogger().debug("%s triggered!", name());
     LocalizationImporterInitHook();
     auto instance = Polyglot::Localization::get_Instance();
     if (!instance->get_SupportedLanguages()->Contains(Polyglot::Language::Simplified_Chinese)) {

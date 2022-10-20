@@ -1,5 +1,8 @@
 """
 Generate localization file for PolyglotInject. Basically replace EN with CN translation
+
+!!!DEPRECATED!!!
+USE UpdateFromOld.py TO UPDATE OLD LOCALIZATION FILE INSTEAD
 """
 
 import csv
