@@ -68,3 +68,4 @@ mod.json.schema
 
 # temp localization files
 scriptes/*.csv
+/mod.json
