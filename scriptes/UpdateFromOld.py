@@ -1,5 +1,10 @@
 """
 Update Old SiraLocalizer localization file by adding new keys from dump of newer version game.
+
+input files:
+Localization_CNMOD.csv (Optional) Old Quest CN Localization (where EN has CN strings)
+sira-locale.csv (required) SiraLocalization file, from Crowdin or a previous version of PolyglotInject (the sira-new.csv in the assets folder)
+beat-saber.csv (required) Base game localization file, dumped by SiraLocalizer
 """
 
 import csv
