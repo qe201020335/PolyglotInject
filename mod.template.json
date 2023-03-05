@@ -5,7 +5,7 @@
   "author": "qe201020335",
   "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.27.0_3631150051",
+  "packageVersion": "1.28.0_4124315132",
   "description": "Inject polyglot localization file into the game.",
   "coverImage": "translate.png",
   "dependencies": [],

@@ -4,7 +4,7 @@
   "info": {
     "name": "PolyglotInject",
     "id": "PolyglotInject",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "url": "https://github.com/qe201020335/PolyglotInject",
     "additionalData": {
       "overrideSoName": "libPolyglotInject.so"
@@ -27,7 +27,7 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.32.0",
+      "versionRange": "^0.33.0",
       "additionalData": {}
     }
   ],
