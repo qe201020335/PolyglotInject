@@ -1,83 +1,75 @@
 #include "main.hpp"
-#include "Polyglot/LocalizationImporter.hpp"
-#include "Polyglot/Localization.hpp"
-#include "Polyglot/LocalizationAsset.hpp"
-#include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "BGLib/Polyglot/LocalizationImporter.hpp"
+#include "BGLib/Polyglot/Localization.hpp"
+#include "BGLib/Polyglot/LocalizationAsset.hpp"
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "assets.hpp"
 #include "helpers.h"
-static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+
+// Stores the ID and version of our mod, and is sent to the modloader upon startup
+static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 static char* sira_new;
 
 // Loads the config from disk using our modInfo, then returns it for use
-Configuration& getConfig() {
-    static Configuration config(modInfo);
-    config.Load();
-    return config;
-}
-
-// Returns a logger, useful for printing debug messages
-Logger& getLogger() {
-    static Logger* logger = new Logger(modInfo);
-    return *logger;
+// other config tools such as config-utils don't use this config, so it can be
+// removed if those are in use
+Configuration &getConfig() {
+  static Configuration config(modInfo);
+  return config;
 }
 
 void loadLocalizationFile() {
     sira_new = new char[sira_new_csv::getLength() + 1];
     memcpy(sira_new, sira_new_csv::getData(), sira_new_csv::getLength());
     sira_new[sira_new_csv::getLength()] = '\0';
-    getLogger().info("Sira Localization File Loaded, Length %lu", sira_new_csv::getLength());
+    PaperLogger.info("Sira Localization File Loaded, Length %lu", sira_new_csv::getLength());
 }
 
 // Called at the early stages of game loading
-extern "C" void setup(ModInfo& info) {
-    info.id = MOD_ID;
-    info.version = VERSION;
-    modInfo = info;
+MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
+  *info = modInfo.to_c();
 
-    getConfig().Load(); // Load the config file
+  getConfig().Load();
 
-    loadLocalizationFile();
+  // File logging
+  Paper::Logger::RegisterFileContextId(PaperLogger.tag);
 
-    getLogger().info("Completed setup!");
+  loadLocalizationFile();
+
+    PaperLogger.info("Completed setup!");
 }
 
 MAKE_HOOK_MATCH(MainSystemInitHook, &GlobalNamespace::MainSystemInit::Init, void, GlobalNamespace::MainSystemInit* self) {
-    getLogger().debug("%s triggered!", name());
-    getLogger().info("Injecting base game localization file!");
+    PaperLogger.debug("%s triggered!", name());
+    PaperLogger.info("Injecting base game localization file!");
 
 //    Polyglot::Localization::get_Instance()->get_InputFiles()->items[0]->set_TextAsset(makeTextAsset(sira_new));
 
-    auto * localizationAsset = Polyglot::LocalizationAsset::New_ctor();
-    localizationAsset->set_TextAsset(makeTextAsset(sira_new));
-    localizationAsset->set_Format(Polyglot::GoogleDriveDownloadFormat::CSV);
-    Polyglot::Localization::get_Instance()->get_InputFiles()->Add(localizationAsset);
-    getLogger().info("Localization file injected!");
+    auto * localizationAsset = BGLib::Polyglot::LocalizationAsset::New_ctor(makeTextAsset(sira_new), BGLib::Polyglot::GoogleDriveDownloadFormat::CSV);
+    BGLib::Polyglot::Localization::get_Instance()->get_InputFiles()->Add(localizationAsset);
+    PaperLogger.info("Localization file injected!");
 
-    Polyglot::LocalizationImporter::Refresh();
+    BGLib::Polyglot::LocalizationImporter::Refresh();
 
-    getLogger().debug("Number of loaded localization assets: %d", Polyglot::Localization::get_Instance()->get_InputFiles()->size);
+    PaperLogger.debug("Number of loaded localization assets: %d", BGLib::Polyglot::Localization::get_Instance()->get_InputFiles()->Count);
     MainSystemInitHook(self);
 }
 
-MAKE_HOOK_MATCH(LocalizationImporterInitHook, &Polyglot::LocalizationImporter::Initialize, void) {
-    getLogger().debug("%s triggered!", name());
-    LocalizationImporterInitHook();
-    auto instance = Polyglot::Localization::get_Instance();
-    if (!instance->get_SupportedLanguages()->Contains(Polyglot::Language::Simplified_Chinese)) {
-        instance->get_SupportedLanguages()->Add(Polyglot::Language::Simplified_Chinese);
+MAKE_HOOK_MATCH(LocalizationImporterInitHook, &BGLib::Polyglot::LocalizationImporter::Initialize, void, BGLib::Polyglot::LocalizationModel* settings) {
+    PaperLogger.debug("%s triggered!", name());
+    LocalizationImporterInitHook(settings);
+    auto instance = BGLib::Polyglot::Localization::get_Instance();
+    if (!instance->get_SupportedLanguages()->Contains(BGLib::Polyglot::Language::Simplified_Chinese)) {
+        instance->get_SupportedLanguages()->Add(BGLib::Polyglot::Language::Simplified_Chinese);
     }
 }
-
 // Called later on in the game loading - a good time to install function hooks
-extern "C" void load() {
-    il2cpp_functions::Init();
+MOD_EXTERN_FUNC void late_load() noexcept {
+  il2cpp_functions::Init();
 
-    LoggerContextObject logger = getLogger().WithContext("load");
-
-    getLogger().info("Installing hooks...");
-    // Install our hooks (none defined yet)
-    INSTALL_HOOK(logger, MainSystemInitHook)
-    INSTALL_HOOK(logger, LocalizationImporterInitHook)
-    getLogger().info("Installed all hooks!");
+  PaperLogger.info("Installing hooks...");
+    // Install our hooks
+    INSTALL_HOOK(PaperLogger, MainSystemInitHook)
+    INSTALL_HOOK(PaperLogger, LocalizationImporterInitHook)
+  PaperLogger.info("Installed all hooks!");
 }

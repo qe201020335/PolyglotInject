@@ -1,6 +1,9 @@
 # PolyglotInject
 
-Inject polyglot localization file into the game
+Inject polyglot localization file into the game.
+
+Use `qpm s build` to build
+Same goes for `qpm s copy` and `qpm s qmod`
 
 ## Credits
 

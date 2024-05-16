@@ -1,4 +1,5 @@
 {
+  "version": "0.2.3",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
@@ -7,29 +8,67 @@
     "version": "0.2.3",
     "url": "https://github.com/qe201020335/PolyglotInject",
     "additionalData": {
-      "overrideSoName": "libPolyglotInject.so"
+      "overrideSoName": "libPolyglotInject.so",
+      "cmake": true
     }
+  },
+  "workspace": {
+    "scripts": {
+      "build": [
+        "pwsh ./scripts/build.ps1"
+      ],
+      "clean": [
+        "pwsh ./scripts/build.ps1 -clean"
+      ],
+      "copy": [
+        "pwsh ./scripts/copy.ps1 $0:?"
+      ],
+      "logcat": [
+        "pwsh ./scripts/start-logging.ps1"
+      ],
+      "qmod": [
+        "pwsh ./scripts/build.ps1",
+        "pwsh ./scripts/createqmod.ps1"
+      ],
+      "restart": [
+        "pwsh ./scripts/restart-game.ps1"
+      ],
+      "stack": [
+        "pwsh ./scripts/ndk-stack.ps1"
+      ],
+      "tomb": [
+        "pwsh ./scripts/pull-tombstone.ps1"
+      ]
+    },
+    "qmodIncludeDirs": [
+      "./build",
+      "./extern/libs"
+    ],
+    "qmodIncludeFiles": [],
+    "qmodOutput": "./PolyglotInject.qmod"
   },
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.14.0",
+      "versionRange": "^5.0.0",
+      "additionalData": {}
+    },
+    {
+      "id": "scotland2",
+      "versionRange": "^0.1.4",
       "additionalData": {
-        "extraFiles": [
-          "src/inline-hook"
-        ]
+        "includeQmod": false
       }
     },
     {
-      "id": "modloader",
-      "versionRange": "=1.2.3",
+      "id": "paper",
+      "versionRange": "^3.0.0",
       "additionalData": {}
     },
     {
-      "id": "codegen",
-      "versionRange": "^0.33.0",
+      "id": "bs-cordl",
+      "versionRange": "^3500.0.0",
       "additionalData": {}
     }
-  ],
-  "additionalData": {}
+  ]
 }

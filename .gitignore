@@ -1,3 +1,5 @@
+.cache/
+
 # Prerequisites
 *.d
 
@@ -54,7 +56,7 @@ Android.mk.backup
 # QPM stuff
 [Ee]xtern/
 *.qmod
-qpm.shared.json
+mod.json
 qpm_defines.cmake
 ![Cc][Mm]ake[Ll]ists.txt
 

@@ -2,7 +2,7 @@
   "configurations": [
     {
       "defines": [
-        "ID=\"PolyglotInject\"",
+        "MOD_ID=\"PolyglotInject\"",
         "VERSION=\"0.1.0\"",
         "__GNUC__",
         "__aarch64__"
@@ -15,13 +15,14 @@
         "${workspaceFolder}/shared", 
         "${workspaceFolder}",
         
-        "C:/Users/qe201/AppData/Local/Android/Sdk/ndk/24.0.8215888/**",
+        "/home/sky/Android/Sdk/ndk/27.0.11718014//**",
         "${default}"
       ],
       "name": "Quest",
       "cStandard": "c11",
       "cppStandard": "c++20",
-      "intelliSenseMode": "clang-x64"
+      "intelliSenseMode": "clang-x64",
+      "compileCommands": "${workspaceFolder}/build/compile_commands.json"
     }
   ],
   "version": 4

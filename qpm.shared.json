@@ -1,0 +1,177 @@
+{
+  "config": {
+    "version": "0.2.3",
+    "sharedDir": "shared",
+    "dependenciesDir": "extern",
+    "info": {
+      "name": "PolyglotInject",
+      "id": "PolyglotInject",
+      "version": "0.2.3",
+      "url": "https://github.com/qe201020335/PolyglotInject",
+      "additionalData": {
+        "overrideSoName": "libPolyglotInject.so",
+        "cmake": true
+      }
+    },
+    "workspace": {
+      "scripts": {
+        "build": [
+          "pwsh ./scripts/build.ps1"
+        ],
+        "clean": [
+          "pwsh ./scripts/build.ps1 -clean"
+        ],
+        "copy": [
+          "pwsh ./scripts/copy.ps1 $0:?"
+        ],
+        "logcat": [
+          "pwsh ./scripts/start-logging.ps1"
+        ],
+        "qmod": [
+          "pwsh ./scripts/build.ps1",
+          "pwsh ./scripts/createqmod.ps1"
+        ],
+        "restart": [
+          "pwsh ./scripts/restart-game.ps1"
+        ],
+        "stack": [
+          "pwsh ./scripts/ndk-stack.ps1"
+        ],
+        "tomb": [
+          "pwsh ./scripts/pull-tombstone.ps1"
+        ]
+      },
+      "qmodIncludeDirs": [
+        "./build",
+        "./extern/libs"
+      ],
+      "qmodIncludeFiles": [],
+      "qmodOutput": "./PolyglotInject.qmod"
+    },
+    "dependencies": [
+      {
+        "id": "beatsaber-hook",
+        "versionRange": "^5.0.0",
+        "additionalData": {}
+      },
+      {
+        "id": "scotland2",
+        "versionRange": "^0.1.4",
+        "additionalData": {
+          "includeQmod": false
+        }
+      },
+      {
+        "id": "paper",
+        "versionRange": "^3.0.0",
+        "additionalData": {}
+      },
+      {
+        "id": "bs-cordl",
+        "versionRange": "^3500.0.0",
+        "additionalData": {}
+      }
+    ]
+  },
+  "restoredDependencies": [
+    {
+      "dependency": {
+        "id": "bs-cordl",
+        "versionRange": "=3500.0.0",
+        "additionalData": {
+          "headersOnly": true,
+          "branchName": "version/v3500_0_0",
+          "compileOptions": {
+            "includePaths": [
+              "include"
+            ],
+            "cppFeatures": [],
+            "cppFlags": [
+              "-DNEED_UNSAFE_CSHARP",
+              "-fdeclspec",
+              "-DUNITY_2021",
+              "-DHAS_CODEGEN"
+            ]
+          }
+        }
+      },
+      "version": "3500.0.0"
+    },
+    {
+      "dependency": {
+        "id": "paper",
+        "versionRange": "=3.6.3",
+        "additionalData": {
+          "soLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/libpaperlog.so",
+          "debugSoLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/debug_libpaperlog.so",
+          "overrideSoName": "libpaperlog.so",
+          "modLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/paperlog.qmod",
+          "branchName": "version/v3_6_3",
+          "compileOptions": {
+            "systemIncludes": [
+              "shared/utfcpp/source"
+            ]
+          },
+          "cmake": false
+        }
+      },
+      "version": "3.6.3"
+    },
+    {
+      "dependency": {
+        "id": "beatsaber-hook",
+        "versionRange": "=5.1.6",
+        "additionalData": {
+          "soLink": "https://github.com/QuestPackageManager/beatsaber-hook/releases/download/v5.1.6/libbeatsaber-hook_5_1_6.so",
+          "debugSoLink": "https://github.com/QuestPackageManager/beatsaber-hook/releases/download/v5.1.6/debug_libbeatsaber-hook_5_1_6.so",
+          "branchName": "version/v5_1_6",
+          "cmake": true
+        }
+      },
+      "version": "5.1.6"
+    },
+    {
+      "dependency": {
+        "id": "libil2cpp",
+        "versionRange": "=0.3.2",
+        "additionalData": {
+          "headersOnly": true,
+          "cmake": false
+        }
+      },
+      "version": "0.3.2"
+    },
+    {
+      "dependency": {
+        "id": "scotland2",
+        "versionRange": "=0.1.4",
+        "additionalData": {
+          "soLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/libsl2.so",
+          "debugSoLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/debug_libsl2.so",
+          "overrideSoName": "libsl2.so",
+          "branchName": "version/v0_1_4"
+        }
+      },
+      "version": "0.1.4"
+    },
+    {
+      "dependency": {
+        "id": "fmt",
+        "versionRange": "=10.0.0",
+        "additionalData": {
+          "headersOnly": true,
+          "branchName": "version/v10_0_0",
+          "compileOptions": {
+            "systemIncludes": [
+              "fmt/include/"
+            ],
+            "cppFlags": [
+              "-DFMT_HEADER_ONLY"
+            ]
+          }
+        }
+      },
+      "version": "10.0.0"
+    }
+  ]
+}
