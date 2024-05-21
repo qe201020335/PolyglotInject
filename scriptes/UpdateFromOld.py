@@ -59,9 +59,9 @@ for missing_key in missing_keys:
         true_missing[missing_key] = bs_og[missing_key][EN]
         print(f"Key '{missing_key}' not found in quest.",
               f"EN: '{bs_og[missing_key][EN]}'",
-              "Translation for CN? '__skip__' to skip", sep="\n")
+              "Translation for CN? '__skip__' or leave empty to skip", sep="\n")
         trans = input()
-        if trans != '__skip__':
+        if trans != '__skip__' and trans != '':
             row[CNS] = trans
         else:
             print("skipped")
