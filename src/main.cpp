@@ -13,7 +13,7 @@
 
 // Stores the ID and version of our mod, and is sent to the modloader upon startup
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
-static char *sira_new;
+static char *localizationString;
 
 // Loads the config from disk using our modInfo, then returns it for use
 // other config tools such as config-utils don't use this config, so it can be
@@ -24,10 +24,10 @@ Configuration &getConfig() {
 }
 
 void loadLocalizationFile() {
-    sira_new = new char[sira_new_csv::getLength() + 1];
-    memcpy(sira_new, sira_new_csv::getData(), sira_new_csv::getLength());
-    sira_new[sira_new_csv::getLength()] = '\0';
-    PaperLogger.info("Sira Localization File Loaded, Length %lu", sira_new_csv::getLength());
+    localizationString = new char[sira_new_csv::getLength() + 1];
+    memcpy(localizationString, sira_new_csv::getData(), sira_new_csv::getLength());
+    localizationString[sira_new_csv::getLength()] = '\0';
+    PaperLogger.info("Localization File Loaded, Length %lu", sira_new_csv::getLength());
 }
 
 // Called at the early stages of game loading
@@ -51,7 +51,7 @@ MAKE_HOOK_MATCH(LocalizationInstallerHook,
                 System::Collections::Generic::IList_1<UnityW<UnityEngine::TextAsset>> * assets, 
                 BGLib::AppFlow::Initialization::AsyncInstaller::IInstallerRegistry* registry) {
     PaperLogger.debug("%s triggered!", name());
-    assets->i___System__Collections__Generic__ICollection_1_T_()->Add(makeTextAsset(sira_new));
+    assets->i___System__Collections__Generic__ICollection_1_T_()->Add(makeTextAsset(localizationString));
     self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::Language::Simplified_Chinese);
     LocalizationInstallerHook(self, assets, registry);
 }
