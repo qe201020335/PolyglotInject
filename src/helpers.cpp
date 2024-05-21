@@ -19,5 +19,5 @@ UnityEngine::TextAsset* makeTextAsset(StringW &s) {
 
 UnityEngine::TextAsset* makeTextAsset(char* &c) {
     StringW s(c);
-    return makeTextAsset(s);
+    return UnityEngine::TextAsset::New_ctor(s);
 }
