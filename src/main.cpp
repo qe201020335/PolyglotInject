@@ -24,10 +24,10 @@ Configuration &getConfig() {
 }
 
 void loadLocalizationFile() {
-    localizationString = new char[sira_new_csv::getLength() + 1];
-    memcpy(localizationString, sira_new_csv::getData(), sira_new_csv::getLength());
-    localizationString[sira_new_csv::getLength()] = '\0';
-    PaperLogger.info("Localization File Loaded, Length %lu", sira_new_csv::getLength());
+    localizationString = new char[polyglot_inject_csv::getLength() + 1];
+    memcpy(localizationString, polyglot_inject_csv::getData(), polyglot_inject_csv::getLength());
+    localizationString[polyglot_inject_csv::getLength()] = '\0';
+    PaperLogger.info("Localization File Loaded, Length %lu", polyglot_inject_csv::getLength());
 }
 
 // Called at the early stages of game loading
