@@ -1,10 +1,20 @@
 """
-Update Old SiraLocalizer localization file by adding new keys from dump of newer version game.
+Update old localization file by adding new keys from dump of newer version game.
 
 input files:
-Localization_CNMOD.csv (Optional) Old Quest CN Localization (where EN has CN strings)
-sira-locale.csv (required) SiraLocalization file, from Crowdin or a previous version of PolyglotInject (the sira-new.csv in the assets folder)
 beat-saber.csv (required) Base game localization file, dumped by SiraLocalizer
+polyglot-inject.csv (optional) localization file, from previous version of PolyglotInject (assets/polyglot-inject.csv)
+sira-locale.csv (optional) SiraLocalization file, from Crowdin or downloaded by SiraLocalizer
+
+output files:
+polyglot-inject-new.csv - Updated localization file, to be used by PolyglotInject
+
+Procedure:
+- sira-locale.csv will be used as base
+- keys deleted by beat games (not found in beat-saber.csv) will be removed
+- for new keys added by beat games, if found in polyglot-inject.csv, use the translation from there
+- If not, prompt for manual input
+- If manual input is empty, skip
 """
 
 import csv
@@ -14,29 +24,43 @@ KEY = 0
 EN = 2
 CNS = 19
 
-try:
-    # load CN translation from previous version
-    with open("Localization_CNMOD.csv", 'r', encoding='utf-8') as csv1:
-        csv_reader1 = csv.reader(csv1)
-        quest_CN = dict((row[KEY], row[EN]) for row in csv_reader1)
-        # print(quest_CN)
-except FileNotFoundError:
-    quest_CN = {}
+# file names
+CSV_NAME_BS = "beat-saber.csv"
+CSV_NAME_PI = "polyglot-inject.csv"
+CSV_NAME_SIRA = "sira-locale.csv"
+CSV_NAME_PI_NEW = "polyglot-inject-new.csv"
 
-with open("sira-locale.csv", 'r', encoding='utf-8') as csv2:
-    csv_reader2 = csv.reader(csv2)
-    sira = dict((row[KEY], row) for row in csv_reader2)
-    # # print(ids2)
 
-with open("beat-saber.csv", 'r', encoding='utf-8') as csv3:
-    csv_reader3 = csv.reader(csv3)
-    bs_og = dict((row[KEY], row) for row in csv_reader3)
+def load_localization(file, throw=True):
+    try:
+        with open(file, 'r', encoding='utf-8') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            return dict((row[KEY], row) for row in csv_reader)
+    except FileNotFoundError:
+        if throw:
+            raise FileNotFoundError(f"File {file} not found")
+        return {}
 
-# find out what is missing from the old sira localizer
-intersect = bs_og.keys() & sira.keys()
-missing_keys = bs_og.keys() - intersect
+
+bs_og = load_localization(CSV_NAME_BS)
+sira = load_localization(CSV_NAME_SIRA, throw=False)
+pi_old = load_localization(CSV_NAME_PI, throw=False)
+
+# find out what is missing from sira localizer
+missing_keys = bs_og.keys() - sira.keys()
+# keys that were deleted from the game
+deleted_keys = sira.keys() - bs_og.keys()
+
 print("\n\n")
-print("WHAT IS MISSING FROM THE OLD SiraLocal FILE: ")
+print("WHAT IS DELETED FROM THE GAME: ")
+print("")
+for deleted_key in deleted_keys:
+    print(deleted_key, sira[deleted_key][EN], sep=": ")
+    sira.pop(deleted_key)
+print()
+
+print("\n\n")
+print("WHAT IS MISSING FROM SIRA_LOCALIZER: ")
 print("")
 for missing_key in missing_keys:
     print(missing_key, bs_og[missing_key][EN], sep=": ")
@@ -49,20 +73,20 @@ for missing_key in missing_keys:
         continue
 
     row = bs_og[missing_key]
-    if missing_key in quest_CN:
-        # found it in quest
-        row[CNS] = quest_CN[missing_key]
+    if missing_key in pi_old:
+        # found it in old PolyglotInject
+        row[CNS] = pi_old[missing_key][CNS]
         print("Found a missing key from old PolyglotInject: ")
-        print(row[EN], quest_CN[missing_key], sep=": ")
+        print(row[EN], row[CNS], sep=": ")
     else:
         # not found, manual enter new translation
         true_missing[missing_key] = bs_og[missing_key][EN]
-        print(f"Key '{missing_key}' not found in quest.",
+        print(f"Key '{missing_key}' not found in localization files.",
               f"EN: '{bs_og[missing_key][EN]}'",
               "Translation for CN? '__skip__' or leave empty to skip", sep="\n")
-        trans = input()
-        if trans != '__skip__' and trans != '':
-            row[CNS] = trans
+        translated = input()
+        if translated != '':
+            row[CNS] = translated
         else:
             print("skipped")
     print("")
@@ -75,6 +99,6 @@ for missing_key in true_missing:
 print("//////////////////////")
 
 # output new polyglot csv
-with open("sira-new.csv", 'w', encoding='utf-8', newline='') as new_csv:
+with open(CSV_NAME_PI_NEW, 'w', encoding='utf-8', newline='') as new_csv:
     csv_writer = csv.writer(new_csv, quotechar='\"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerows(sira.values())
