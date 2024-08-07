@@ -10,6 +10,7 @@
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "System/Collections/Generic/ICollection_1.hpp"
 #include "System/Collections/Generic/List_1.hpp"
+#include "System/Collections/Generic/IList_1.hpp"
 
 // Stores the ID and version of our mod, and is sent to the modloader upon startup
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
