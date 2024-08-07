@@ -54,7 +54,6 @@ MAKE_HOOK_MATCH(LocalizationInstallerHook,
     PaperLogger.debug("%s triggered!", name());
     assets->i___System__Collections__Generic__ICollection_1_T_()->Add(makeTextAsset(localizationString));
     self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::Language::Simplified_Chinese);
-    self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::Language::Traditional_Chinese);
     LocalizationInstallerHook(self, assets, registry);
 }
 
