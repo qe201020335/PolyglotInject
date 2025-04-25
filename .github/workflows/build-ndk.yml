@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       name: Checkout
       with:
         submodules: true
@@ -50,10 +50,11 @@ jobs:
 
     - uses: seanmiddleditch/gha-setup-ninja@v3
 
-    # Use canary NDK to avoid lesser known compile bugs
-    - name: Setup canary NDK
+    - uses: nttld/setup-ndk@v1
       id: setup-ndk
-      uses: ./.github/actions/canary-ndk
+      with:
+        ndk-version: r28b
+        add-to-path: false
 
     - name: Create ndkpath.txt
       run: |
