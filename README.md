@@ -2,8 +2,9 @@
 
 Inject polyglot localization file into the game.
 
-Use `qpm s build` to build
-Same goes for `qpm s copy` and `qpm s qmod`
+- Use `qpm s build` to build
+- Use `qpm s copy` to copy mod to Quest and launch the game 
+- Use `qpm s qmod` to create the qmod file
 
 ## Credits
 
