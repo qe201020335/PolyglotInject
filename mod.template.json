@@ -1,16 +1,19 @@
 {
   "$schema": "https://raw.githubusercontent.com/Lauriethefish/QuestPatcher.QMod/main/QuestPatcher.QMod/Resources/qmod.schema.json",
-  "_QPVersion": "0.1.1",
+  "_QPVersion": "1.1.0",
   "name": "${mod_name}",
   "id": "${mod_id}",
+  "modloader": "Scotland2",
   "author": "qe201020335",
-  "version": "0.4.0",
+  "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
   "packageVersion": "1.37.0_9064817954",
   "description": "Inject polyglot localization file into the game.",
   "coverImage": "PolyglotInject.png",
   "dependencies": [],
   "modFiles": ["${binary}"],
+  "lateModFiles": [],
   "libraryFiles": [],
-  "fileCopies": []
+  "fileCopies": [],
+  "copyExtensions": []
 }
