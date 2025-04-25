@@ -1,12 +1,12 @@
 {
   "config": {
-    "version": "0.3.0",
+    "version": "0.4.0",
     "sharedDir": "shared",
     "dependenciesDir": "extern",
     "info": {
       "name": "PolyglotInject",
       "id": "PolyglotInject",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "url": "https://github.com/qe201020335/PolyglotInject",
       "additionalData": {
         "overrideSoName": "libPolyglotInject.so",
