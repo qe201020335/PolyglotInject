@@ -2,6 +2,8 @@
 #include "assets.hpp"
 #include "helpers.h"
 
+#include "scotland2/shared/modloader.h"
+
 #include "BGLib/Polyglot/LocalizationImporter.hpp"
 #include "BGLib/Polyglot/Localization.hpp"
 #include "BGLib/Polyglot/LocalizationAsset.hpp"
