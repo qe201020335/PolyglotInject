@@ -33,7 +33,7 @@ namespace PolyglotInject
             Log = logger;
             Plugin.Log.Info("OnApplicationStart");
             
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("PolyglotInject.assets.sira-new.csv")!;
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("PolyglotInject.assets.polyglot-inject.csv")!;
             using var reader = new StreamReader(stream);
             LocalicationString = reader.ReadToEnd();
             

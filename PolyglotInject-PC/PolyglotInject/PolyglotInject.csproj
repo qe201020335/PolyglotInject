@@ -98,7 +98,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="assets\sira-new.csv" />
+    <EmbeddedResource Include="assets\polyglot-inject.csv" />
     <EmbeddedResource Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
