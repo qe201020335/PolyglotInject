@@ -24,8 +24,10 @@ if ($LASTEXITCODE -ne 0) {
 $modJson = Get-Content $mod -Raw | ConvertFrom-Json
 
 if ($qmodName -eq "") {
-    $qmodName = $modJson.name
+    $qmodName = "$($modJson.name)-$($modJson.version)-bs$($modJson.packageVersion)"
 }
+
+Write-Output "Using qmod name: $qmodName"
 
 $filelist = @($mod)
 
@@ -76,3 +78,5 @@ $qmod = $qmodName + ".qmod"
 
 Compress-Archive -Path $filelist -DestinationPath $zip -Update
 Move-Item $zip $qmod -Force
+
+Write-Output "qmod created: $qmod"
