@@ -1,13 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.shared.schema.json",
   "config": {
-    "version": "0.7.0",
+    "version": "0.8.0",
     "sharedDir": "shared",
     "dependenciesDir": "extern",
     "info": {
       "name": "PolyglotInject",
       "id": "PolyglotInject",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "url": "https://github.com/qe201020335/PolyglotInject",
       "additionalData": {
         "overrideSoName": "libPolyglotInject.so",
@@ -69,7 +69,7 @@
       },
       {
         "id": "bs-cordl",
-        "versionRange": "^4007.0.0",
+        "versionRange": "^4008.0.0",
         "additionalData": {}
       }
     ]
@@ -78,10 +78,10 @@
     {
       "dependency": {
         "id": "bs-cordl",
-        "versionRange": "=4007.0.0",
+        "versionRange": "=4008.0.0",
         "additionalData": {
           "headersOnly": true,
-          "branchName": "version/v4007_0_0",
+          "branchName": "version/v4008_0_0",
           "compileOptions": {
             "includePaths": [
               "include"
@@ -97,7 +97,7 @@
           }
         }
       },
-      "version": "4007.0.0"
+      "version": "4008.0.0"
     },
     {
       "dependency": {
