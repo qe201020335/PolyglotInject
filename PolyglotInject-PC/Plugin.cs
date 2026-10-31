@@ -149,4 +149,27 @@ namespace PolyglotInject
             Plugin.Log.Info($"Dumped {count} localization assets.");
         }
     }
+
+    /// <summary>
+    /// The game saves Simplified Chinese as "zh_CH" but expects "zh_CN" when parsing it back. Anything else starting
+    /// with "zh" becomes Traditional Chinese.
+    /// 1.40.8 saves "zh" so we should map this to Simplified Chinese too.
+    /// </summary>
+    [HarmonyPatch(typeof(LocalizationLanguageExtensions), nameof(LocalizationLanguageExtensions.ToLocalizationLanguage), typeof(string))]
+    public class SimplifiedChineseParsePatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(string? serializedName, ref LocalizationLanguage __result)
+        {
+            var name = serializedName?.Replace('-', '_');
+            if (!string.Equals(name, "zh_ch", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(name, "zh", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            __result = LocalizationLanguage.Simplified_Chinese;
+            return false;
+        }
+    }
 }
