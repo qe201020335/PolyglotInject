@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BGLib.Polyglot;
 using HarmonyLib;
 using IPA;
+using IPA.Loader;
 using IPA.Utilities;
 using PolyglotInject.SiraLocalizer.Providers.Crowdin;
 using UnityEngine;
@@ -33,6 +34,11 @@ namespace PolyglotInject
             Log = logger;
             Plugin.Log.Info("OnApplicationStart");
             
+            if (PluginManager.GetPluginFromId("SiraLocalizer") != null)
+            {
+                Log.Warn("SiraLocalizer is installed, not installing patches to avoid conflicts.");
+                return;
+            }
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("PolyglotInject.assets.polyglot-inject.csv")!;
             using var reader = new StreamReader(stream);
             LocalicationString = reader.ReadToEnd();
