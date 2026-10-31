@@ -94,7 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\assets\polyglot-inject.csv">
+    <EmbeddedResource Include="..\assets\polyglot-inject.csv">
       <Link>assets\polyglot-inject.csv</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="manifest.json" />
