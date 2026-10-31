@@ -75,7 +75,7 @@ namespace PolyglotInject
             }
             
             assets.Add(new TextAsset(Plugin.Instance.LocalicationString));
-            __instance._mainPolyglotAsset.supportedLanguages.Add(Language.Simplified_Chinese);
+            __instance._mainPolyglotAsset.supportedLanguages.Add(LocalizationLanguage.Simplified_Chinese);
         }
 
         private static void DumpLocalization(ref IList<TextAsset> assets)
