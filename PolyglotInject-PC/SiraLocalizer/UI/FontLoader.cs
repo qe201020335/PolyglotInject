@@ -26,7 +26,6 @@ namespace PolyglotInject.SiraLocalizer.UI
         ];
 
         private readonly List<TMP_FontAsset> _fallbackFontAssets = [];
-        private readonly List<TMP_FontAsset> _createdFontAssets = [];
         private readonly List<TMP_FontAsset> _processedFontAssets = [];
 
         public async void Initialize()
@@ -49,12 +48,7 @@ namespace PolyglotInject.SiraLocalizer.UI
 
             foreach (TMP_FontAsset fontAsset in _processedFontAssets)
             {
-                fontAsset.fallbackFontAssetTable.RemoveAll(f => _createdFontAssets.Contains(f) || _fallbackFontAssets.Contains(f));
-            }
-
-            foreach (TMP_FontAsset fontAsset in _createdFontAssets)
-            {
-                Object.Destroy(fontAsset);
+                fontAsset.fallbackFontAssetTable.RemoveAll(f => _fallbackFontAssets.Contains(f));
             }
 
             foreach (TMP_FontAsset fontAsset in _fallbackFontAssets)
@@ -63,7 +57,6 @@ namespace PolyglotInject.SiraLocalizer.UI
             }
 
             _processedFontAssets.Clear();
-            _createdFontAssets.Clear();
             _fallbackFontAssets.Clear();
         }
 
@@ -147,15 +140,11 @@ namespace PolyglotInject.SiraLocalizer.UI
             Plugin.Log.Info($"Adding fallbacks to '{fontAsset.name}' ({fontAsset.GetInstanceID()})");
 
             fontAsset.fallbackFontAssetTable.RemoveAll(f => kFontNamesToRemove.Contains(f.name));
+            fontAsset.fallbackFontAssetTable.InsertRange(0, fallbacks);
 
-            foreach (TMP_FontAsset fallback in fallbacks.Reverse())
+            if (fontAsset.m_CharacterLookupDictionary != null)
             {
-                // creating a copy is necessary to prevent fonts from overwriting each others' atlases
-                TMP_FontAsset fallbackCopy = FontAssetHelper.CopyFontAsset(fallback, fontAsset.material);
-                _createdFontAssets.Add(fallbackCopy);
-
-                // insert as first possible fallback font
-                fontAsset.fallbackFontAssetTable.Insert(0, fallbackCopy);
+                fontAsset.ClearFallbackCharacterTable();
             }
 
             _processedFontAssets.Add(fontAsset);

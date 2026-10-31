@@ -76,19 +76,19 @@ namespace PolyglotInject
         /// <summary>
         /// Match SiraLocalizer
         /// </summary>
-        private static readonly Language[] AddedLanguages =
+        private static readonly LocalizationLanguage[] AddedLanguages =
         [
-            Language.Italian,
-            Language.Portuguese_Brazil,
-            Language.Russian,
-            Language.Danish,
-            Language.Swedish,
-            Language.Dutch,
-            Language.Simplified_Chinese,
-            Language.Traditional_Chinese,
-            Language.Czech,
-            Language.Hungarian,
-            Language.Hebrew
+            LocalizationLanguage.Italian,
+            LocalizationLanguage.Portuguese_Brazil,
+            LocalizationLanguage.Russian,
+            LocalizationLanguage.Danish,
+            LocalizationLanguage.Swedish,
+            LocalizationLanguage.Dutch,
+            LocalizationLanguage.Simplified_Chinese,
+            LocalizationLanguage.Traditional_Chinese,
+            LocalizationLanguage.Czech,
+            LocalizationLanguage.Hungarian,
+            LocalizationLanguage.Hebrew
         ];
 
         [HarmonyPrefix]
