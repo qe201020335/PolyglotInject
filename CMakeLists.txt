@@ -6,8 +6,8 @@ include(qpm_defines.cmake)
 project(${COMPILE_ID})
 
 # C++ standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED 20)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED 26)
 
 # Provide compile commands so they can be used for intellisense
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)

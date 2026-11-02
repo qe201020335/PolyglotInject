@@ -41,6 +41,7 @@
     "qmodIncludeDirs": [
       "./build",
       "./extern/libs",
+      "./fonts",
       "."
     ],
     "qmodIncludeFiles": [],
@@ -72,6 +73,11 @@
     {
       "id": "bs-cordl",
       "versionRange": "^4008.0.0",
+      "additionalData": {}
+    },
+    {
+      "id": "metacore",
+      "versionRange": "^1.6.3",
       "additionalData": {}
     }
   ]
