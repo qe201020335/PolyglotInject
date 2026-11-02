@@ -11,6 +11,7 @@ using IPA;
 using IPA.Loader;
 using IPA.Utilities;
 using PolyglotInject.SiraLocalizer.Providers.Crowdin;
+using PolyglotInject.SiraLocalizer.UI;
 using UnityEngine;
 using IPALogger = IPA.Logging.Logger;
 
@@ -29,6 +30,8 @@ namespace PolyglotInject
 
         internal string LocalicationString;
 
+        private FontLoader? _fontLoader;
+
         [Init]
         public Plugin(IPALogger logger)
         {
@@ -46,15 +49,24 @@ namespace PolyglotInject
             LocalicationString = reader.ReadToEnd();
             
             HarmonyInstance.PatchAll();
+            _fontLoader = new FontLoader();
         }
 
         [OnEnable]
         public async Task OnEnable()
         {
+            _fontLoader?.Initialize();
+
             var downloader = new CrowdinDownloader();
             Log.Info("Download SiraLocalizer localization assets.");
             await downloader.DownloadLocalizationsAsync(default);
             Log.Info("SiraLocalizer localization assets downloaded.");
+        }
+
+        [OnDisable]
+        public void OnDisable()
+        {
+            _fontLoader?.Dispose();
         }
     }
     
