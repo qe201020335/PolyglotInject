@@ -17,54 +17,54 @@
     "workspace": {
       "scripts": {
         "build": [
-          "pwsh ./scripts/build.ps1"
-        ],
-        "clean": [
-          "pwsh ./scripts/build.ps1 -clean"
+          "python ./extern/includes/mod-scripts/shared/build.py $0:?"
         ],
         "copy": [
-          "pwsh ./scripts/copy.ps1 $0:?"
+          "python ./extern/includes/mod-scripts/shared/cpy.py $0:?"
         ],
-        "logcat": [
-          "pwsh ./scripts/start-logging.ps1"
+        "debug": [
+          "python ./extern/includes/mod-scripts/shared/debug.py $0:?"
         ],
-        "qmod": [
-          "pwsh ./scripts/build.ps1",
-          "pwsh ./scripts/createqmod.ps1"
+        "log": [
+          "python ./extern/includes/mod-scripts/shared/log.py $0:?"
+        ],
+        "profile": [
+          "python ./extern/includes/mod-scripts/shared/profile.py $0:?"
         ],
         "restart": [
-          "pwsh ./scripts/restart-game.ps1"
-        ],
-        "stack": [
-          "pwsh ./scripts/ndk-stack.ps1"
-        ],
-        "tomb": [
-          "pwsh ./scripts/pull-tombstone.ps1"
+          "python ./extern/includes/mod-scripts/shared/restart.py $0:?"
         ]
       },
+      "ndk": "^28.2.13676358",
       "qmodIncludeDirs": [
         "./build",
-        "./extern/libs"
+        "./extern/libs",
+        "."
       ],
       "qmodIncludeFiles": [],
       "qmodOutput": "./PolyglotInject.qmod"
     },
     "dependencies": [
       {
-        "id": "beatsaber-hook",
-        "versionRange": "^6.0.0",
+        "id": "mod-scripts",
+        "versionRange": "^1.0.2",
         "additionalData": {}
       },
       {
         "id": "scotland2",
-        "versionRange": "^0.1.4",
+        "versionRange": "^0.1.7",
         "additionalData": {
           "includeQmod": false
         }
       },
       {
         "id": "paper2_scotland2",
-        "versionRange": "^4.0.0",
+        "versionRange": "^4.8.0",
+        "additionalData": {}
+      },
+      {
+        "id": "beatsaber-hook",
+        "versionRange": "^6.4.2",
         "additionalData": {}
       },
       {
@@ -75,6 +75,37 @@
     ]
   },
   "restoredDependencies": [
+    {
+      "dependency": {
+        "id": "mod-scripts",
+        "versionRange": "=1.0.2",
+        "additionalData": {
+          "headersOnly": true,
+          "branchName": "version/v1_0_2",
+          "cmake": false
+        }
+      },
+      "version": "1.0.2"
+    },
+    {
+      "dependency": {
+        "id": "paper2_scotland2",
+        "versionRange": "=4.8.0",
+        "additionalData": {
+          "soLink": "https://github.com/Fernthedev/paperlog/releases/download/v4.8.0/libpaper2_scotland2.so",
+          "overrideSoName": "libpaper2_scotland2.so",
+          "modLink": "https://github.com/Fernthedev/paperlog/releases/download/v4.8.0/paper2_scotland2.qmod",
+          "branchName": "version/v4_8_0",
+          "compileOptions": {
+            "systemIncludes": [
+              "shared/utfcpp/source"
+            ]
+          },
+          "cmake": false
+        }
+      },
+      "version": "4.8.0"
+    },
     {
       "dependency": {
         "id": "bs-cordl",
@@ -101,22 +132,22 @@
     },
     {
       "dependency": {
-        "id": "paper2_scotland2",
-        "versionRange": "=4.6.4",
+        "id": "fmt",
+        "versionRange": "=11.0.2",
         "additionalData": {
-          "soLink": "https://github.com/Fernthedev/paperlog/releases/download/v4.6.4/libpaper2_scotland2.so",
-          "overrideSoName": "libpaper2_scotland2.so",
-          "modLink": "https://github.com/Fernthedev/paperlog/releases/download/v4.6.4/paper2_scotland2.qmod",
-          "branchName": "version/v4_6_4",
+          "headersOnly": true,
+          "branchName": "version/v11_0_2",
           "compileOptions": {
             "systemIncludes": [
-              "shared/utfcpp/source"
+              "fmt/include/"
+            ],
+            "cppFlags": [
+              "-DFMT_HEADER_ONLY"
             ]
-          },
-          "cmake": false
+          }
         }
       },
-      "version": "4.6.4"
+      "version": "11.0.2"
     },
     {
       "dependency": {
@@ -140,6 +171,19 @@
     },
     {
       "dependency": {
+        "id": "scotland2",
+        "versionRange": "=0.1.7",
+        "additionalData": {
+          "soLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.7/libsl2.so",
+          "debugSoLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.7/debug_libsl2.so",
+          "overrideSoName": "libsl2.so",
+          "branchName": "version/v0_1_7"
+        }
+      },
+      "version": "0.1.7"
+    },
+    {
+      "dependency": {
         "id": "libil2cpp",
         "versionRange": "=0.4.0",
         "additionalData": {
@@ -153,38 +197,6 @@
         }
       },
       "version": "0.4.0"
-    },
-    {
-      "dependency": {
-        "id": "scotland2",
-        "versionRange": "=0.1.6",
-        "additionalData": {
-          "soLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.6/libsl2.so",
-          "debugSoLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.6/debug_libsl2.so",
-          "overrideSoName": "libsl2.so",
-          "branchName": "version/v0_1_6"
-        }
-      },
-      "version": "0.1.6"
-    },
-    {
-      "dependency": {
-        "id": "fmt",
-        "versionRange": "=11.0.2",
-        "additionalData": {
-          "headersOnly": true,
-          "branchName": "version/v11_0_2",
-          "compileOptions": {
-            "systemIncludes": [
-              "fmt/include/"
-            ],
-            "cppFlags": [
-              "-DFMT_HEADER_ONLY"
-            ]
-          }
-        }
-      },
-      "version": "11.0.2"
     }
   ]
 }

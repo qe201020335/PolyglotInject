@@ -1,8 +1,15 @@
+// Include our main header file, containing the logger
 #include "main.hpp"
 #include "assets.hpp"
 #include "helpers.h"
 
+// Include dependency headers
 #include "scotland2/shared/modloader.h"
+
+#include "beatsaber-hook/shared/config/config-utils.hpp"
+#include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
+#include "beatsaber-hook/shared/utils/logging.hpp"
 
 #include "BGLib/Polyglot/LocalizationImporter.hpp"
 #include "BGLib/Polyglot/Localization.hpp"
@@ -14,37 +21,30 @@
 #include "System/Collections/Generic/List_1.hpp"
 #include "System/Collections/Generic/IList_1.hpp"
 
-// Stores the ID and version of our mod, and is sent to the modloader upon startup
+// Store the mod ID and version, so it can be sent to the modloader at startup
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 static char *localizationString;
-
-// Loads the config from disk using our modInfo, then returns it for use
-// other config tools such as config-utils don't use this config, so it can be
-// removed if those are in use
-Configuration &getConfig() {
-    static Configuration config(modInfo);
-    return config;
-}
 
 void loadLocalizationFile() {
     localizationString = new char[polyglot_inject_csv::getLength() + 1];
     memcpy(localizationString, polyglot_inject_csv::getData(), polyglot_inject_csv::getLength());
     localizationString[polyglot_inject_csv::getLength()] = '\0';
-    PaperLogger.info("Localization File Loaded, Length %lu", polyglot_inject_csv::getLength());
+    logger.info("Localization File Loaded, Length %lu", polyglot_inject_csv::getLength());
 }
 
-// Called at the early stages of game loading
-MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
+// Called in the early stages of game loading
+// (see https://github.com/sc2ad/scotland2?tab=readme-ov-file#installationusage)
+// Often used to initialize and load configs, in addition to its contents here
+extern "C" __attribute__((visibility("default"))) void setup(CModInfo* info) noexcept {
     *info = modInfo.to_c();
 
-    getConfig().Load();
-
-    // File logging
-    Paper::Logger::RegisterFileContextId(PaperLogger.tag);
+    // Optionally register our logger so that all its messages
+    // are stored in a dedicated file
+    Paper::Logger::RegisterFileContextId(MOD_ID);
 
     loadLocalizationFile();
 
-    PaperLogger.info("Completed setup!");
+    logger.info("Completed setup!");
 }
 
 MAKE_HOOK_MATCH(LocalizationInstallerHook, 
@@ -53,18 +53,19 @@ MAKE_HOOK_MATCH(LocalizationInstallerHook,
                 BGLib::Polyglot::LocalizationAsyncInstaller *self, 
                 System::Collections::Generic::IList_1<UnityW<UnityEngine::TextAsset>> * assets, 
                 BGLib::AppFlow::Initialization::AsyncInstaller::IInstallerRegistry* registry) {
-    PaperLogger.debug("%s triggered!", name());
+    logger.debug("%s triggered!", name());
     assets->i___System__Collections__Generic__ICollection_1_T_()->Add(makeTextAsset(localizationString));
     self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::Language::Simplified_Chinese);
     LocalizationInstallerHook(self, assets, registry);
 }
 
-// Called later on in the game loading - a good time to install function hooks
-MOD_EXTERN_FUNC void late_load() noexcept {
+// Called later on in the game loading, after all mods have been opened
+// Often used to install hooks and use the APIs of other mods or libraries
+extern "C" __attribute__((visibility("default"))) void late_load() noexcept {
     il2cpp_functions::Init();
 
-    PaperLogger.info("Installing hooks...");
+    logger.info("Installing hooks...");
     // Install our hooks
-    INSTALL_HOOK(PaperLogger, LocalizationInstallerHook)
-    PaperLogger.info("Installed all hooks!");
+    INSTALL_HOOK(logger, LocalizationInstallerHook)
+    logger.info("Installed all hooks!");
 }

@@ -1,0 +1,7 @@
+Diagnostics:
+  UnusedIncludes: None
+---
+If:
+  PathMatch: ./extern/.*
+Index:
+  Background: Skip

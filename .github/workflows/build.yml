@@ -1,0 +1,74 @@
+name: Build
+
+env:
+  module_id: PolyglotInject
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - "version*"
+    paths-ignore:
+      - "**.md"
+      - "**.yml"
+      - ".clangd"
+      - ".clang-format"
+      - ".gitignore"
+      - "!.github/workflows/build.yml"
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        name: Checkout
+        with:
+          submodules: true
+          lfs: true
+
+      - name: Setup QPM
+        uses: Fernthedev/qpm-action@v1
+        with:
+          workflow_token: ${{ secrets.GITHUB_TOKEN }}
+          restore: true
+          resolve_ndk: true
+          cache: true
+
+      - name: Build & Create QMOD
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          qpm qmod zip
+
+      - name: Get Output Names
+        id: names
+        run: |
+          pattern="*.qmod"
+          files=( $pattern )
+          echo QMOD="${files[0]}" >> $GITHUB_OUTPUT
+          cd build
+          pattern="lib${module_id}*.so"
+          files=( $pattern )
+          echo LIB="${files[0]}" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.names.outputs.LIB }}
+          path: ./build/${{ steps.names.outputs.LIB }}
+          if-no-files-found: error
+
+      - name: Upload Debug Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: debug_${{ steps.names.outputs.LIB }}
+          path: ./build/debug/${{ steps.names.outputs.LIB }}
+          if-no-files-found: error
+
+      - name: Upload QMOD Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.names.outputs.QMOD }}
+          path: ./${{ steps.names.outputs.QMOD }}
+          if-no-files-found: error
