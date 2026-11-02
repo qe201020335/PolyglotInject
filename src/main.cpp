@@ -60,7 +60,30 @@ MAKE_HOOK_MATCH(LocalizationInstallerHook,
                 BGLib::AppFlow::Initialization::IInstallerRegistry* registry) {
     logger.debug("%s triggered!", name());
     assets->i___System__Collections__Generic__ICollection_1_T_()->Add(makeTextAsset(localizationString));
-    self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::LocalizationLanguage::Simplified_Chinese);
+
+    // Match SiraLocalizer
+    using BGLib::Polyglot::LocalizationLanguage;
+    auto addedLanguages = {
+        LocalizationLanguage::Italian,
+        LocalizationLanguage::Portuguese_Brazil,
+        LocalizationLanguage::Russian,
+        LocalizationLanguage::Danish,
+        LocalizationLanguage::Swedish,
+        LocalizationLanguage::Dutch,
+        LocalizationLanguage::Simplified_Chinese,
+        LocalizationLanguage::Traditional_Chinese,
+        LocalizationLanguage::Czech,
+        LocalizationLanguage::Hungarian,
+        LocalizationLanguage::Hebrew
+    };
+
+    auto supportedLanguages = self->_mainPolyglotAsset->supportedLanguages;
+    for (auto language : addedLanguages) {
+        if (!supportedLanguages->Contains(language)) {
+            supportedLanguages->Add(language);
+        }
+    }
+
     LocalizationInstallerHook(self, assets, registry);
 }
 
