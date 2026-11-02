@@ -61,7 +61,24 @@ namespace PolyglotInject
     [HarmonyPatch(typeof(LocalizationAsyncInstaller), nameof(LocalizationAsyncInstaller.LoadResourcesBeforeInstall))]
     public class LocalizationAssetPatch
     {
-        
+        /// <summary>
+        /// Match SiraLocalizer
+        /// </summary>
+        private static readonly Language[] AddedLanguages =
+        [
+            Language.Italian,
+            Language.Portuguese_Brazil,
+            Language.Russian,
+            Language.Danish,
+            Language.Swedish,
+            Language.Dutch,
+            Language.Simplified_Chinese,
+            Language.Traditional_Chinese,
+            Language.Czech,
+            Language.Hungarian,
+            Language.Hebrew
+        ];
+
         [HarmonyPrefix]
         private static void Prefix(LocalizationAsyncInstaller __instance, ref IList<TextAsset> assets)
         {
@@ -77,7 +94,15 @@ namespace PolyglotInject
             }
             
             assets.Add(new TextAsset(Plugin.Instance.LocalicationString));
-            __instance._mainPolyglotAsset.supportedLanguages.Add(Language.Simplified_Chinese);
+
+            var supportedLanguages = __instance._mainPolyglotAsset.supportedLanguages;
+            foreach (var language in AddedLanguages)
+            {
+                if (!supportedLanguages.Contains(language))
+                {
+                    supportedLanguages.Add(language);
+                }
+            }
         }
 
         private static void DumpLocalization(ref IList<TextAsset> assets)
