@@ -16,6 +16,8 @@
 #include "BGLib/Polyglot/Localization.hpp"
 #include "BGLib/Polyglot/LocalizationAsset.hpp"
 #include "BGLib/Polyglot/LocalizationAsyncInstaller.hpp"
+#include "BGLib/Polyglot/Language.hpp"
+#include "BGLib/Polyglot/LanguageExtensions.hpp"
 #include "BGLib/AppFlow/Initialization/AsyncInstaller.hpp"
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "System/Collections/Generic/ICollection_1.hpp"
@@ -87,6 +89,22 @@ MAKE_HOOK_MATCH(LocalizationInstallerHook,
     LocalizationInstallerHook(self, assets, registry);
 }
 
+// The game saves both Chinese as "zh" and both Portuguese as "pt", which parse back as Simplified Chinese and
+// Portuguese. This make sure they are saved correctly.
+MAKE_HOOK_MATCH(SerializedNameHook,
+                &BGLib::Polyglot::LanguageExtensions::ToSerializedName,
+                StringW,
+                BGLib::Polyglot::Language lang) {
+    using BGLib::Polyglot::Language;
+    if (lang == Language::Traditional_Chinese) {
+        return "zh-Hant";
+    }
+    if (lang == Language::Portuguese_Brazil) {
+        return "pt-BR";
+    }
+    return SerializedNameHook(lang);
+}
+
 MAKE_HOOK_MATCH(SceneLoadedHook,
                 &UnityEngine::SceneManagement::SceneManager::Internal_SceneLoaded,
                 void,
@@ -104,6 +122,7 @@ extern "C" __attribute__((visibility("default"))) void late_load() noexcept {
     logger.info("Installing hooks...");
     // Install our hooks
     INSTALL_HOOK(logger, LocalizationInstallerHook)
+    INSTALL_HOOK(logger, SerializedNameHook)
     INSTALL_HOOK(logger, SceneLoadedHook)
     logger.info("Installed all hooks!");
 
