@@ -6,20 +6,25 @@
 // Include dependency headers
 #include "scotland2/shared/modloader.h"
 
-#include "beatsaber-hook/shared/config/config-utils.hpp"
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
-#include "beatsaber-hook/shared/utils/logging.hpp"
+#include "beatsaber-hook/shared/hooking.hpp"
+#include "beatsaber-hook/shared/api.hpp"
 
 #include "BGLib/Polyglot/LocalizationImporter.hpp"
 #include "BGLib/Polyglot/Localization.hpp"
 #include "BGLib/Polyglot/LocalizationAsset.hpp"
 #include "BGLib/Polyglot/LocalizationAsyncInstaller.hpp"
+#include "BGLib/Polyglot/LocalizationLanguage.hpp"
+#include "BGLib/Polyglot/LocalizationLanguageExtensions.hpp"
 #include "BGLib/AppFlow/Initialization/AsyncInstaller.hpp"
+#include "BGLib/AppFlow/Initialization/IInstallerRegistry.hpp"
 #include "GlobalNamespace/MainSystemInit.hpp"
 #include "System/Collections/Generic/ICollection_1.hpp"
 #include "System/Collections/Generic/List_1.hpp"
 #include "System/Collections/Generic/IList_1.hpp"
+
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 // Store the mod ID and version, so it can be sent to the modloader at startup
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
@@ -52,20 +57,47 @@ MAKE_HOOK_MATCH(LocalizationInstallerHook,
                 void, 
                 BGLib::Polyglot::LocalizationAsyncInstaller *self, 
                 System::Collections::Generic::IList_1<UnityW<UnityEngine::TextAsset>> * assets, 
-                BGLib::AppFlow::Initialization::AsyncInstaller::IInstallerRegistry* registry) {
+                BGLib::AppFlow::Initialization::IInstallerRegistry* registry) {
     logger.debug("%s triggered!", name());
     assets->i___System__Collections__Generic__ICollection_1_T_()->Add(makeTextAsset(localizationString));
-    self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::Language::Simplified_Chinese);
+    self->_mainPolyglotAsset->supportedLanguages->Add(BGLib::Polyglot::LocalizationLanguage::Simplified_Chinese);
     LocalizationInstallerHook(self, assets, registry);
+}
+
+static bool isSimplifiedChinese(StringW serializedName) {
+    if (!serializedName) {
+        return false;
+    }
+
+    std::string name = serializedName;
+    std::ranges::transform(name, name.begin(), [](unsigned char c) -> char {
+        return c == '-' ? '_' : std::tolower(c);
+    });
+    return name == "zh_ch" || name == "zh";
+}
+
+// The game saves Simplified Chinese as "zh_CH" but expects "zh_CN" when parsing it back.
+// Anything else starting with "zh" becomes Traditional Chinese.
+// 1.40.8 saves "zh" so we should map this to Simplified Chinese too.
+MAKE_HOOK_MATCH(SimplifiedChineseParseHook,
+                &BGLib::Polyglot::LocalizationLanguageExtensions::ToLocalizationLanguage,
+                BGLib::Polyglot::LocalizationLanguage,
+                StringW serializedName) {
+    logger.debug("{} triggered!", name());
+    if (isSimplifiedChinese(serializedName)) {
+        return BGLib::Polyglot::LocalizationLanguage::Simplified_Chinese;
+    }
+    return SimplifiedChineseParseHook(serializedName);
 }
 
 // Called later on in the game loading, after all mods have been opened
 // Often used to install hooks and use the APIs of other mods or libraries
 extern "C" __attribute__((visibility("default"))) void late_load() noexcept {
-    il2cpp_functions::Init();
+    i2c::functions::initialize();
 
     logger.info("Installing hooks...");
     // Install our hooks
     INSTALL_HOOK(logger, LocalizationInstallerHook)
+    INSTALL_HOOK(logger, SimplifiedChineseParseHook)
     logger.info("Installed all hooks!");
 }

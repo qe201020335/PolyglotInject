@@ -6,8 +6,8 @@ include(qpm_defines.cmake)
 project(${COMPILE_ID})
 
 # C++ standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED 20)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED 26)
 
 # Provide compile commands so they can be used for intellisense
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
@@ -43,14 +43,8 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 recurse_files(cpp_file_list ${SOURCE_DIR}/*.cpp)
 recurse_files(c_file_list ${SOURCE_DIR}/*.c)
 
-# Add files used in beatsaber-hook's hooking library
-recurse_files(inline_hook_c ${EXTERN_DIR}/includes/beatsaber-hook/shared/inline-hook/*.c)
-recurse_files(inline_hook_cpp ${EXTERN_DIR}/includes/beatsaber-hook/shared/inline-hook/*.cpp)
-
 # Add all source files to compilation
-add_library(
-    ${COMPILE_ID} SHARED ${cpp_file_list} ${c_file_list} ${inline_hook_cpp} ${inline_hook_c}
-)
+add_library(${COMPILE_ID} SHARED ${cpp_file_list} ${c_file_list})
 
 # Add include directories to compilation
 target_include_directories(${COMPILE_ID} PRIVATE ${INCLUDE_DIR})
