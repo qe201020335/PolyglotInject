@@ -41,6 +41,7 @@
     "qmodIncludeDirs": [
       "./build",
       "./extern/libs",
+      "./fonts",
       "."
     ],
     "qmodIncludeFiles": [],
@@ -77,6 +78,11 @@
     {
       "id": "flamingo",
       "versionRange": "~1.2.1",
+      "additionalData": {}
+    },
+    {
+      "id": "metacore",
+      "versionRange": "^2.0.6",
       "additionalData": {}
     }
   ]

@@ -2,6 +2,7 @@
 #include "main.hpp"
 #include "assets.hpp"
 #include "helpers.h"
+#include "SiraLocalizer/UI/FontLoader.hpp"
 
 // Include dependency headers
 #include "scotland2/shared/modloader.h"
@@ -21,6 +22,9 @@
 #include "System/Collections/Generic/ICollection_1.hpp"
 #include "System/Collections/Generic/List_1.hpp"
 #include "System/Collections/Generic/IList_1.hpp"
+#include "UnityEngine/SceneManagement/LoadSceneMode.hpp"
+#include "UnityEngine/SceneManagement/Scene.hpp"
+#include "UnityEngine/SceneManagement/SceneManager.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -29,6 +33,7 @@
 // Store the mod ID and version, so it can be sent to the modloader at startup
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 static char *localizationString;
+static PolyglotInject::SiraLocalizer::UI::FontLoader fontLoader;
 
 void loadLocalizationFile() {
     localizationString = new char[polyglot_inject_csv::getLength() + 1];
@@ -113,6 +118,15 @@ MAKE_HOOK_MATCH(SimplifiedChineseParseHook,
     return SimplifiedChineseParseHook(serializedName);
 }
 
+MAKE_HOOK_MATCH(SceneLoadedHook,
+                &UnityEngine::SceneManagement::SceneManager::Internal_SceneLoaded,
+                void,
+                UnityEngine::SceneManagement::Scene scene,
+                UnityEngine::SceneManagement::LoadSceneMode mode) {
+    SceneLoadedHook(scene, mode);
+    fontLoader.OnSceneLoaded();
+}
+
 // Called later on in the game loading, after all mods have been opened
 // Often used to install hooks and use the APIs of other mods or libraries
 extern "C" __attribute__((visibility("default"))) void late_load() noexcept {
@@ -122,5 +136,8 @@ extern "C" __attribute__((visibility("default"))) void late_load() noexcept {
     // Install our hooks
     INSTALL_HOOK(logger, LocalizationInstallerHook)
     INSTALL_HOOK(logger, SimplifiedChineseParseHook)
+    INSTALL_HOOK(logger, SceneLoadedHook)
     logger.info("Installed all hooks!");
+
+    fontLoader.Initialize();
 }

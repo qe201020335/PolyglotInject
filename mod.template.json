@@ -14,6 +14,11 @@
   "modFiles": ["${binary}"],
   "lateModFiles": [],
   "libraryFiles": [],
-  "fileCopies": [],
+  "fileCopies": [
+    {
+      "name": "fonts.bundle",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PolyglotInject/fonts.bundle"
+    }
+  ],
   "copyExtensions": []
 }
