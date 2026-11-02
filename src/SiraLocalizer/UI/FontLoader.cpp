@@ -2,9 +2,10 @@
 
 #include "main.hpp"
 
-#include "beatsaber-hook/shared/utils/typedefs-wrappers.hpp"
+#include "beatsaber-hook/shared/safeptr.hpp"
 #include "metacore/shared/unity.hpp"
 
+#include "System/Collections/Generic/Dictionary_2.hpp"
 #include "System/Collections/Generic/List_1.hpp"
 #include "TMPro/TMP_Text.hpp"
 #include "UnityEngine/AssetBundleCreateRequest.hpp"
@@ -47,7 +48,7 @@ namespace PolyglotInject::SiraLocalizer::UI {
     template <typename T>
     static void Await(T* operation, std::function<void(T*)> next) {
         // The GC can't see into these lambdas, so the operation needs a handle to survive until then.
-        SafePtr<T> handle(operation);
+        safe_ptr<T*> handle(operation);
         MetaCore::Engine::ScheduleMainThread([handle]() { return handle->isDone; }, [handle, next = std::move(next)]() {
             try {
                 next(handle.ptr());
@@ -84,7 +85,7 @@ namespace PolyglotInject::SiraLocalizer::UI {
                 return;
             }
 
-            SafePtrUnity<AssetBundle> assetBundle(loadedAssetBundle.ptr());
+            safe_ptr<AssetBundle*> assetBundle(loadedAssetBundle.ptr());
 
             Await<AssetBundleRequest>(assetBundle->LoadAllAssetsAsync(), [this, assetBundle, onLoaded](auto*) {
                 std::set<std::string_view> fontNames;
@@ -103,7 +104,7 @@ namespace PolyglotInject::SiraLocalizer::UI {
 
     void FontLoader::LoadFontAsset(AssetBundle* assetBundle, std::string_view name) {
         // this is basically instant since we've called LoadAllAssetsAsync previously
-        UnityW<Object> asset = assetBundle->LoadAsset(std::string(name), csTypeOf(TMP_FontAsset*));
+        UnityW<Object> asset = assetBundle->LoadAsset(std::string(name), i2c::cs_type_of<TMP_FontAsset*>());
 
         if (!asset) {
             logger.error("Font '{}' could not be loaded; some characters may not display as expected", name);
@@ -114,7 +115,7 @@ namespace PolyglotInject::SiraLocalizer::UI {
 
         // Resources.UnloadUnusedAssets can't see this list either, and the fonts may not be in a fallback table yet.
         asset->hideFlags = HideFlags::DontUnloadUnusedAsset;
-        _fallbackFontAssets.emplace_back(il2cpp_utils::cast<TMP_FontAsset>(asset.ptr()));
+        _fallbackFontAssets.emplace_back(i2c::cast<TMP_FontAsset*>(asset.ptr()));
     }
 
     void FontLoader::ApplyFallbackFonts() {
@@ -142,8 +143,8 @@ namespace PolyglotInject::SiraLocalizer::UI {
         }
 
         // force update any text that has already rendered
-        for (auto text : Object::FindObjectsByType(csTypeOf(TMP_Text*), FindObjectsSortMode::None)) {
-            il2cpp_utils::cast<TMP_Text>(text.ptr())->SetAllDirty();
+        for (auto text : Object::FindObjectsByType(i2c::cs_type_of<TMP_Text*>(), FindObjectsSortMode::None)) {
+            i2c::cast<TMP_Text*>(text.ptr())->SetAllDirty();
         }
     }
 
@@ -161,6 +162,10 @@ namespace PolyglotInject::SiraLocalizer::UI {
 
         for (int i = 0; i < fallbacks.size(); i++) {
             fallbackFontAssetTable->Insert(i, fallbacks[i]);
+        }
+
+        if (fontAsset->m_CharacterLookupDictionary) {
+            fontAsset->ClearFallbackCharacterTable();
         }
 
         _processedFontAssets.insert(fontAsset->GetInstanceID());
