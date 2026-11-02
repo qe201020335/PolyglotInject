@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using BGLib.Polyglot;
 using HarmonyLib;
@@ -87,14 +89,26 @@ namespace PolyglotInject
             }
             
             var count = 0;
-            foreach (var asset in assets)
+            var merged = new StringBuilder();
+            // The game's asset order isn't stable between runs, so put the main asset first by size.
+            foreach (var asset in assets.OrderByDescending(asset => asset.text.Length))
             {
                 count++;
                 using var file = File.CreateText(Path.Combine(basePath, $"localization_asset_{count}.csv"));
                 file.Write(asset.text);
                 file.Close();
+
+                // Not every asset ends with a newline, and the next one must start on its own row.
+                merged.Append(asset.text);
+                if (!asset.text.EndsWith("\n"))
+                {
+                    merged.Append('\n');
+                }
             }
-            
+
+            // Input for scriptes/UpdateFromOld.py. Every asset repeats the same header rows, which the script dedupes by key.
+            File.WriteAllText(Path.Combine(basePath, "beat-saber.csv"), merged.ToString());
+
             Plugin.Log.Info($"Dumped {count} localization assets.");
         }
     }
