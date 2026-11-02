@@ -30,6 +30,9 @@
       "profile": [
         "python ./extern/includes/mod-scripts/shared/profile.py $0:?"
       ],
+      "qmod": [
+        "pwsh ./scripts/qmod.ps1 $0:?"
+      ],
       "restart": [
         "python ./extern/includes/mod-scripts/shared/restart.py $0:?"
       ]
