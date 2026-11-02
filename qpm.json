@@ -73,7 +73,7 @@
     },
     {
       "id": "flamingo",
-      "versionRange": "^1.3.0",
+      "versionRange": "~1.2.1",
       "additionalData": {}
     }
   ]
