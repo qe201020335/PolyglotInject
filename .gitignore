@@ -23,7 +23,7 @@ build/
 *.html
 
 # temp localization files
-scriptes/*.csv
+scripts/*.csv
 /mod.json
 
 # Exceptions
