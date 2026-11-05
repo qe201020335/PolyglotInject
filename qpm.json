@@ -1,12 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.schema.json",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
     "name": "PolyglotInject",
     "id": "PolyglotInject",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "url": "https://github.com/qe201020335/PolyglotInject",
     "additionalData": {
       "overrideSoName": "libPolyglotInject.so",
