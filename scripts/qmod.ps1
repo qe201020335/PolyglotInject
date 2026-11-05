@@ -1,4 +1,4 @@
-# Builds the qmod, named <name>-<version>-bs<packageVersion>.qmod
+# Builds the qmod, named <name>-<version>-bs<packageVersion>-<commit>.qmod
 # Arguments are passed on to `qpm qmod zip`, for example --clean or --skip_build
 Set-Location "$PSScriptRoot/.."
 
@@ -8,5 +8,12 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $mod = Get-Content ./mod.json -Raw | ConvertFrom-Json
-qpm qmod zip @args "$($mod.name)-$($mod.version)-bs$($mod.packageVersion).qmod"
+$name = "$($mod.name)-$($mod.version)-bs$($mod.packageVersion)"
+
+$commit = git rev-parse --short HEAD 2>$null
+if ($LASTEXITCODE -eq 0 -and $commit) {
+    $name += "-$commit"
+}
+
+qpm qmod zip @args "$name.qmod"
 exit $LASTEXITCODE
