@@ -6,8 +6,8 @@ env:
 on:
   workflow_dispatch:
   push:
-    branches-ignore:
-      - "version*"
+    tags:
+      - "v*"
     paths-ignore:
       - "**.md"
       - "**.yml"
@@ -51,6 +51,8 @@ jobs:
           pattern="lib${module_id}*.so"
           files=( $pattern )
           echo LIB="${files[0]}" >> $GITHUB_OUTPUT
+          cd debug
+          mv ${files[0]} debug_${files[0]}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v6
@@ -63,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: debug_${{ steps.names.outputs.LIB }}
-          path: ./build/debug/${{ steps.names.outputs.LIB }}
+          path: ./build/debug/debug_${{ steps.names.outputs.LIB }}
           if-no-files-found: error
 
       - name: Upload QMOD Artifact
@@ -72,3 +74,17 @@ jobs:
           name: ${{ steps.names.outputs.QMOD }}
           path: ./${{ steps.names.outputs.QMOD }}
           if-no-files-found: error
+
+      # if we had a tag, we should make a release
+      - name: Create Draft Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          generate_release_notes: true
+          files: |
+            build/${{ steps.names.outputs.LIB }}
+            build/debug/debug_${{ steps.names.outputs.LIB }}
+            ${{ steps.names.outputs.QMOD }}
