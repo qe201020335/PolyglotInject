@@ -1,3 +1,10 @@
+> [!WARNING]
+> PolyglotInject is replaced by [Loqolizer](https://github.com/BeatSaberCN/Loqolizer).
+> PolyglotInject's final release: [1.40.8](https://github.com/qe201020335/PolyglotInject/releases/tag/v0.9.0%2Bbs1.40.8_7379) [1.45.3](https://github.com/qe201020335/PolyglotInject/releases/tag/v0.10.0%2Bbs1.45.3_30054)
+>
+> PolyglotInject 已被 [Loqolizer](https://github.com/BeatSaberCN/Loqolizer) 取代。
+> PolyglotInject 的最终版本：[1.40.8](https://github.com/qe201020335/PolyglotInject/releases/tag/v0.9.0%2Bbs1.40.8_7379) [1.45.3](https://github.com/qe201020335/PolyglotInject/releases/tag/v0.10.0%2Bbs1.45.3_30054)
+
 # PolyglotInject
 
 Inject polyglot localization file into the game.
